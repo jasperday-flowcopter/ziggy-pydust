@@ -51,8 +51,13 @@ def zig_build(argv: list[str], conf: config.ToolPydust | None = None):
     zig_exe = [os.path.expanduser(conf.zig_exe)] if conf.zig_exe else [sys.executable, "-m", "ziglang"]
 
     cmds = zig_exe + ["build", "--build-file", conf.build_zig] + argv
+    try:
+        subprocess.run(cmds, check=True, capture_output=True)
+    except CalledProcessError as e:
+        print("Stdout:", e.stdout, sep="\n")
+        print("Stderr:", e.stderr, sep="\n")
+        raise e
 
-    subprocess.run(cmds, check=True)
 
 
 def generate_build_zig(fileobj: TextIO, conf=None):
